@@ -9,20 +9,21 @@
 import SwiftUI
 
 struct ContentView: View {
-    
     @State private var newTodo = ""
     @State private var allTodos: [TodoItem] = []
+    private let todosKey = "todosKey"
     
     var body: some View {
         NavigationView {
             VStack {
                 HStack {
-                    TextField("Add todo...", text: $newTodo)
+                    TextField("Adicionar tarefa...", text: $newTodo)
                         .textFieldStyle(RoundedBorderTextFieldStyle())
                     Button(action: {
                         guard !self.newTodo.isEmpty else {return}
                         self.allTodos.append(TodoItem(todo: self.newTodo))
                         self.newTodo = ""
+                        self.saveTodos()
                         
                     }) {
                         Image(systemName: "plus")
@@ -35,13 +36,16 @@ struct ContentView: View {
                         Text(todoItem.todo)
                     }
                 }
-            }.navigationBarTitle("Todos")
+            }.navigationBarTitle("Tarefas")
         }
+    }
+    private func saveTodos(){
+        UserDefaults.standard.set(try? PropertyListEncoder().encode(self.allTodos), forKey: todosKey)
     }
 }
 
-struct TodoItem: Identifiable {
-    let id = UUID()
+struct TodoItem: Codable, Identifiable {
+    var id = UUID()
     let todo: String
 }
 
